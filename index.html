@@ -11,14 +11,28 @@
     <body>
         <p>Test</p>
         <script src="" async defer>
+            //todo
+            // randomly generate cost for college in range and add 7% intrest rate 
+            // add debt affecting stress exponential scale | set hard limit for debt at 700,000
+            // add debt growth rate ignore cars for now 
+            // update job to add function to be vairable 
+            // thursday 
+            // housing 
+            // job experience
+            
+
+
+
+
             class Player{
-                constructor(name,age, wealth,stress,education, job){
+                constructor(name,age, wealth,stress,education, job,debt){
                     this.name = name;
                     this.age = age;
                     this.wealth = wealth;
                     this.stress = stress; // percent from 0 -100
                     this.education = education;
                     this.job = job;// ['job_name', yearly income]
+                    this.debt = debt;
                 }
                 chapter(){
                     this.age = this.age + 4;
@@ -30,6 +44,7 @@
                     }else{
                         this.stress = 60;
                     }
+                    // add debt affecting stress exponential scale | set hard limit for debt at 700,000
                 }
                 get_job(){
                     base = 35000;
@@ -52,6 +67,10 @@
                     }else{
                         alert('your too broke to afford this');
                     }
+                }
+                college(){
+                    // randomly generate cost for college in range and add 7% intrest rate 
+
                 }
 
                 
