@@ -10,6 +10,59 @@
     </head>
     <body>
         <p>Test</p>
-        <script src="" async defer></script>
+        <script src="" async defer>
+            class Player{
+                constructor(name,age, wealth,stress,education, job){
+                    this.name = name;
+                    this.age = age;
+                    this.wealth = wealth;
+                    this.stress = stress; // percent from 0 -100
+                    this.education = education;
+                    this.job = job;// ['job_name', yearly income]
+                }
+                chapter(){
+                    this.age = this.age + 4;
+                    this.wealth = this.wealth + ( 4 * this.job[1]);
+                    if (this.education == "Trade School"){
+                        this.stress = 70;
+                    }else if (this.education == "4 Year College"){
+                        this.stress = 90;
+                    }else{
+                        this.stress = 60;
+                    }
+                }
+                get_job(){
+                    base = 35000;
+                    name = "";
+                    if (this.education == "Trade School"){
+                        base = base + 15000;
+                        name = 'Electrian';
+                    }else if (this.education == "4 Year College"){
+                        base = base + 25000;
+                        name = 'Coroporate Job';
+                    }else{
+                        base = 35000;
+                        name = 'McDonalds Drive-Thru Cashier';
+                    }
+                    this.job = [name,base];
+                }
+                buy(x){
+                    if( this.wealth >= x){
+                        this.wealth = this.wealth - x[0];
+                    }else{
+                        alert('your too broke to afford this');
+                    }
+                }
+
+                
+
+
+            }
+            const player = new Player('setup_name_later',18,10000,0,'High School',0);
+            
+
+
+
+        </script>
     </body>
 </html>
