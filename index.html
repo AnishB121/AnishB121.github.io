@@ -8,8 +8,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="static\style.css">
     </head>
-    <body>
+    <body onload="display_stats()">
         <p>Test</p>
+        <p id="wealth"></p>
+        <p id="debt"></p>
+        <p id="gameplay"></p>
+        <button type="button" onclick="chapter()">Continue</button>
+
         <script src="" async defer>
             //todo
             // randomly generate cost for college in range and add 7% intrest rate 
@@ -36,6 +41,7 @@
                 }
                 chapter(){
                     this.age = this.age + 4;
+                    this.debt *= 1.07;
                     this.wealth = this.wealth + ( 4 * this.job[1]);
                     if (this.education == "Trade School"){
                         this.stress = 70;
@@ -45,6 +51,7 @@
                         this.stress = 60;
                     }
                     // add debt affecting stress exponential scale | set hard limit for debt at 700,000
+                    setStress();
                 }
                 get_job(){
                     base = 35000;
@@ -70,16 +77,25 @@
                 }
                 college(){
                     // randomly generate cost for college in range and add 7% intrest rate 
-
+                    collegeCost = (int)(Math.random * 20000) + 10000;
+                    setStress();
+                    this.debt += collegeCost;
                 }
-
-                
-
-
+                set_stress() {
+                    this.stress = 0.000001* Math.pow(Math.E, collegeCost);
+                }
+                add_debt(amount) {
+                    this.debt += amount;
+                    if (this.debt > 700000) debt = 700000;
+                }
             }
             const player = new Player('setup_name_later',18,10000,0,'High School',0);
             
-
+            display_stats()
+            {
+                document.getElementById("debt").innerHTML = player.debt;
+                document.getElementById("wealth").innerHTML = player.wealth;
+            }
 
 
         </script>
