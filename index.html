@@ -8,7 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="static\style.css">
     </head>
-    <body onload="display_stats()">
+    <body>
         <p>Test</p>
         <p id="wealth"></p>
         <p id="debt"></p>
@@ -18,9 +18,14 @@
             <div id="job-options"></div>
         </div>
     
-        <button type="button" onclick="chapter()">Continue</button>
+        <button type="button" id="continue">Continue</button>
+
+        <script>
+            document.getElementById("gameplay").innerHTML = "Test";
+        </script>
 
         <script src="" async defer>
+
             //todo
             // randomly generate cost for college in range and add 7% intrest rate 
             // add debt affecting stress exponential scale | set hard limit for debt at 700,000
@@ -28,12 +33,9 @@
             // update job to add function to be vairable 
             // housing 
             //job experience
-            
 
-
-
-
-            class Player{
+            class Player
+            {
                 constructor(name,age, wealth,stress,education, job,debt,job_experience){
                     this.name = name;
                     this.age = age;
@@ -58,88 +60,87 @@
                     // add debt affecting stress exponential scale | set hard limit for debt at 700,000
                     setStress();
                 }
-    get_job() {
-        const jobs = {
-            "None": [
-                { title: "Walmart", baseSalary: 28000 },
-                { title: "Construction ", baseSalary: 32000 },
-                { title: "McDonalds Worker", baseSalary: 25000 }
-            ],
-            "Trade School": [
-                { title: "Electrician", baseSalary: 50000 },
-                { title: "Plumber", baseSalary: 48000 },
-                { title: "Technician", baseSalary: 47000 }
-            ],
-            "4 Year College": [
-                { title: "Software Developer", baseSalary: 70000 },
-                { title: "Financial Analyst", baseSalary: 65000 },
-                { title: "Marketing Manager", baseSalary: 60000 }
-            ]
-        };
+                get_job() {
+                    const jobs = {
+                        "None": [
+                            { title: "Walmart", baseSalary: 28000 },
+                            { title: "Construction ", baseSalary: 32000 },
+                            { title: "McDonalds Worker", baseSalary: 25000 }
+                        ],
+                        "Trade School": [
+                            { title: "Electrician", baseSalary: 50000 },
+                            { title: "Plumber", baseSalary: 48000 },
+                            { title: "Technician", baseSalary: 47000 }
+                        ],
+                        "4 Year College": [
+                            { title: "Software Developer", baseSalary: 70000 },
+                            { title: "Financial Analyst", baseSalary: 65000 },
+                            { title: "Marketing Manager", baseSalary: 60000 }
+                        ]
+                    };
 
-        const experienceMultiplier = 1 + (this.job_experience / 10); 
-        const educationLevel = this.education || "None";
-        const availableJobs = jobs[educationLevel];
+                    const experienceMultiplier = 1 + (this.job_experience / 10); 
+                    const educationLevel = this.education || "None";
+                    const availableJobs = jobs[educationLevel];
 
-        
-        const shuffledJobs = availableJobs.sort(() => 0.5 - Math.random()).slice(0, 3);
+                    
+                    const shuffledJobs = availableJobs.sort(() => 0.5 - Math.random()).slice(0, 3);
 
-        
-        const jobOptionsDiv = document.getElementById("job-options");
-        jobOptionsDiv.innerHTML = ""; 
-        shuffledJobs.forEach((job, index) => {
-            const adjustedSalary = Math.round(job.baseSalary * experienceMultiplier);
-            const jobButton = document.createElement("button");
-            jobButton.innerText = `${job.title} - $${adjustedSalary}/year`;
-            jobButton.onclick = () => this.select_job(job.title, adjustedSalary);
-            jobOptionsDiv.appendChild(jobButton);
-            jobOptionsDiv.appendChild(document.createElement("br"));
-        });
-
-
-        document.getElementById("job-selection").style.display = "block";
-    }
-    select_job(jobTitle, salary) {
-        this.job = [jobTitle, salary];
-        document.getElementById("job-selection").style.display = "none";
-        display_stats();
-    }
-    buy(x){
-        if( this.wealth >= x){
-            this.wealth = this.wealth - x[0];
-        }else{
-            alert('your too broke to afford this');
-            }
-        }
-    college(){
-        // randomly generate cost for college in range and add 7% intrest rate 
-        collegeCost = (int)(Math.random * 20000) + 10000;
-        setStress();
-        this.debt += collegeCost;
-        }
-    set_stress() {
-        this.stress = 0.000001* Math.pow(Math.E, collegeCost);
-    }
-    add_debt(amount) {
-        this.debt += amount;
-        if (this.debt > 700000) debt = 700000;
-        }
-    }
-    const player = new Player('setup_name_later',18,10000,0,'High School',0);
-            
-    display_stats()
-    {
-        document.getElementById("debt").innerHTML = player.debt;
-        document.getElementById("wealth").innerHTML = player.wealth;
-    }
-
-    function run(){
-        player.chapter();
-        display_stats();
-        player.get_job();
-    }
+                    
+                    const jobOptionsDiv = document.getElementById("job-options");
+                    jobOptionsDiv.innerHTML = ""; 
+                    shuffledJobs.forEach((job, index) => {
+                        const adjustedSalary = Math.round(job.baseSalary * experienceMultiplier);
+                        const jobButton = document.createElement("button");
+                        jobButton.innerText = `${job.title} - $${adjustedSalary}/year`;
+                        jobButton.onclick = () => this.select_job(job.title, adjustedSalary);
+                        jobOptionsDiv.appendChild(jobButton);
+                        jobOptionsDiv.appendChild(document.createElement("br"));
+                    });
 
 
+                    document.getElementById("job-selection").style.display = "block";
+                }
+                select_job(jobTitle, salary) {
+                    this.job = [jobTitle, salary];
+                    document.getElementById("job-selection").style.display = "none";
+                    display_stats();
+                }
+                buy(x){
+                    if( this.wealth >= x){
+                        this.wealth = this.wealth - x[0];
+                    }else{
+                        alert('your too broke to afford this');
+                        }
+                    }
+                college(){
+                    // randomly generate cost for college in range and add 7% intrest rate 
+                    collegeCost = (int)(Math.random * 20000) + 10000;
+                    setStress();
+                    this.debt += collegeCost;
+                }
+                set_stress() {
+                    this.stress = 0.000001* Math.pow(Math.E, collegeCost);
+                }
+                add_debt(amount) {
+                    this.debt += amount;
+                    if (this.debt > 700000) debt = 700000;
+                    }
+                }
+                const player = new Player('setup_name_later',18,10000,0,'High School',0);
+                        
+                function display_stats()
+                {
+                    document.getElementById("debt").innerHTML = player.debt;
+                    document.getElementById("wealth").innerHTML = player.wealth;
+                }
+
+                function run(){
+                    document.getElementById("continue").addEventListener("click", chapter, false);
+                    player.chapter();
+                    display_stats();
+                    player.get_job();
+                }
         </script>
     </body>
 </html>
