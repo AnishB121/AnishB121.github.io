@@ -13,7 +13,7 @@
         <p id="wealth"></p>
         <p id="debt"></p>
         <p id="gameplay"></p>
-        <div id="job-selection" style="display:none;">
+        <div id="job-selection">
             <h3>Select a Job</h3>
             <div id="job-options"></div>
         </div>
@@ -24,7 +24,7 @@
             document.getElementById("gameplay").innerHTML = "Test";
         </script>
 
-        <script src="" async defer>
+        <script>
 
             //todo
             // randomly generate cost for college in range and add 7% intrest rate 
@@ -58,11 +58,10 @@
                         this.stress = 60;
                     }
                     // add debt affecting stress exponential scale | set hard limit for debt at 700,000
-                    setStress();
                 }
                 get_job() {
                     const jobs = {
-                        "None": [
+                        "High School": [
                             { title: "Walmart", baseSalary: 28000 },
                             { title: "Construction ", baseSalary: 32000 },
                             { title: "McDonalds Worker", baseSalary: 25000 }
@@ -73,7 +72,7 @@
                             { title: "Technician", baseSalary: 47000 }
                         ],
                         "4 Year College": [
-                            { title: "Software Developer", baseSalary: 70000 },
+                            { title: "Software Manager", baseSalary: 70000 },
                             { title: "Financial Analyst", baseSalary: 65000 },
                             { title: "Marketing Manager", baseSalary: 60000 }
                         ]
@@ -83,20 +82,23 @@
                     const educationLevel = this.education || "None";
                     const availableJobs = jobs[educationLevel];
 
-                    
-                    const shuffledJobs = availableJobs.sort(() => 0.5 - Math.random()).slice(0, 3);
 
+           
                     
                     const jobOptionsDiv = document.getElementById("job-options");
                     jobOptionsDiv.innerHTML = ""; 
-                    shuffledJobs.forEach((job, index) => {
-                        const adjustedSalary = Math.round(job.baseSalary * experienceMultiplier);
+                    for (const {title, baseSalary} of availableJobs){
+                        const adjustedSalary = Math.round(baseSalary * 1);
+                        console.log(this.job_experience);
                         const jobButton = document.createElement("button");
-                        jobButton.innerText = `${job.title} - $${adjustedSalary}/year`;
-                        jobButton.onclick = () => this.select_job(job.title, adjustedSalary);
+                        jobButton.innerText = `${title} - $${adjustedSalary}/year`;
+                        jobButton.onclick = () => this.select_job(title, adjustedSalary);
                         jobOptionsDiv.appendChild(jobButton);
                         jobOptionsDiv.appendChild(document.createElement("br"));
-                    });
+                    }
+
+
+
 
 
                     document.getElementById("job-selection").style.display = "block";
@@ -120,27 +122,33 @@
                     this.debt += collegeCost;
                 }
                 set_stress() {
-                    this.stress = 0.000001* Math.pow(Math.E, collegeCost);
+                    this.stress = 0.000001* Math.pow(Math.E, this.debt);
                 }
                 add_debt(amount) {
                     this.debt += amount;
                     if (this.debt > 700000) debt = 700000;
-                    }
                 }
-                const player = new Player('setup_name_later',18,10000,0,'High School',0);
+            }
                         
-                function display_stats()
-                {
-                    document.getElementById("debt").innerHTML = player.debt;
-                    document.getElementById("wealth").innerHTML = player.wealth;
-                }
+            function display_stats()
+            {
+                document.getElementById("debt").innerHTML = player.debt;
+                document.getElementById("wealth").innerHTML = player.wealth;
+            }
 
-                function run(){
-                    document.getElementById("continue").addEventListener("click", chapter, false);
-                    player.chapter();
-                    display_stats();
-                    player.get_job();
-                }
+            function run(){
+                console.log('gh');
+                player.set_stress();
+                document.getElementById("continue").addEventListener("click", player.chapter(), false);
+                player.chapter();
+                display_stats();
+                player.get_job();
+            }
+            
+            const player = new Player('setup_name_later',18,10000,0,'High School',0);
+            run();
+            player.chapter();
+            
         </script>
     </body>
 </html>
