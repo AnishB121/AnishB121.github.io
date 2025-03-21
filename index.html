@@ -9,7 +9,7 @@
         <link rel="stylesheet" href="static\style.css">
     </head>
     <body>
-        <p>Test</p>
+        <p>Money-Up</p>
         <p id="wealth"></p>
         <p id="debt"></p>
         <p id="gameplay"></p>
@@ -19,10 +19,6 @@
         </div>
     
         <button type="button" id="continue">Continue</button>
-
-        <script>
-            document.getElementById("gameplay").innerHTML = "Test";
-        </script>
 
         <script>
 
@@ -47,6 +43,7 @@
                     this.job_experience = job_experience;//years 
                 }
                 chapter(){
+                    console.log(this.debt + " | " + this.wealth);
                     this.age = this.age + 4;
                     this.debt *= 1.07;
                     this.wealth = this.wealth + ( 4 * this.job[1]);
@@ -130,18 +127,19 @@
                 }
             }
                         
-            function display_stats()
+            function display_stats(player)
             {
+                console.log(player.debt)
                 document.getElementById("debt").innerHTML = player.debt;
                 document.getElementById("wealth").innerHTML = player.wealth;
             }
 
             function run(){
                 console.log('gh');
-                player.set_stress();
+                //player.set_stress();
                 document.getElementById("continue").addEventListener("click", player.chapter(), false);
-                player.chapter();
-                display_stats();
+                //player.chapter();
+                display_stats(player);
                 player.get_job();
             }
             
