@@ -46,7 +46,8 @@
                     console.log(this.debt + " | " + this.wealth);
                     this.age = this.age + 4;
                     this.debt *= 1.07;
-                    this.wealth = this.wealth + ( 4 * this.job[1]);
+                    console.log(this.job[1]);
+                    this.wealth = parseFloat(this.wealth) + ( 4 * parseInt(this.job[1]));
                     if (this.education == "Trade School"){
                         this.stress = 70;
                     }else if (this.education == "4 Year College"){
@@ -54,6 +55,7 @@
                     }else{
                         this.stress = 60;
                     }
+                    console.log(this.debt + " | " + this.wealth);
                     // add debt affecting stress exponential scale | set hard limit for debt at 700,000
                 }
                 get_job() {
@@ -63,11 +65,13 @@
                             { title: "Construction ", baseSalary: 32000 },
                             { title: "McDonalds Worker", baseSalary: 25000 }
                         ],
+                        
                         "Trade School": [
                             { title: "Electrician", baseSalary: 50000 },
                             { title: "Plumber", baseSalary: 48000 },
                             { title: "Technician", baseSalary: 47000 }
                         ],
+                        
                         "4 Year College": [
                             { title: "Software Manager", baseSalary: 70000 },
                             { title: "Financial Analyst", baseSalary: 65000 },
@@ -77,14 +81,15 @@
 
                     const experienceMultiplier = 1 + (this.job_experience / 10); 
                     const educationLevel = this.education || "None";
+                    console.log(educationLevel);
+                    console.log(jobs);
                     const availableJobs = jobs[educationLevel];
-
-
+                    console.log(availableJobs);
            
                     
                     const jobOptionsDiv = document.getElementById("job-options");
                     jobOptionsDiv.innerHTML = ""; 
-                    for (const {title, baseSalary} of availableJobs){
+                    for (const {title, baseSalary} of availableJobs) {
                         const adjustedSalary = Math.round(baseSalary * 1);
                         console.log(this.job_experience);
                         const jobButton = document.createElement("button");
@@ -127,9 +132,9 @@
                 }
             }
                         
-            function display_stats(player)
+            function display_stats()
             {
-                console.log(player.debt)
+                console.log(player.wealth)
                 document.getElementById("debt").innerHTML = player.debt;
                 document.getElementById("wealth").innerHTML = player.wealth;
             }
@@ -143,7 +148,7 @@
                 player.get_job();
             }
             
-            const player = new Player('setup_name_later',18,10000,0,'High School',0);
+            const player = new Player('setup_name_later', 18, "10000", 0 , 'High School', "", 0, 0);
             run();
             player.chapter();
             
