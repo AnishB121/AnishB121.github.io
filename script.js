@@ -456,8 +456,7 @@ class Player {
         if (this.debt > 700000) this.debt = 700000; 
     }
 
-    calculate_income_tax(income)
-    {
+    calculate_income_tax(income) {
         if (income > 721314) return 0.123;
         else if (income > 432787) return 0.113;
         else if (income > 360659) return 0.103;
@@ -466,7 +465,7 @@ class Player {
         else if (income > 40245) return 0.06;
         else if (income > 25499) return 0.04;
         else if (income > 10756) return 0.02;
-        else return 0.01%
+        else return 0.01;
     }
 }
             
