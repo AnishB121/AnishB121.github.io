@@ -48,7 +48,8 @@ class Player {
         
         if (this.job) {
             console.log(this.job[1]);
-            this.wealth = parseFloat(this.wealth) + (4 * parseInt(this.job[1]));
+            let raw_income = job[1] * (1 - calculate_income_tax(job[1]));
+            this.wealth = parseFloat(this.wealth) + (4 * parseInt(raw_income));
         }
         
         if (this.education == "Trade School") {
@@ -378,6 +379,7 @@ class Player {
         messageDiv.appendChild(message);
         messageDiv.appendChild(continueBtn);
         
+        display_stats();
         display_gameplay("College Complete!", messageDiv);
     }
 
@@ -453,6 +455,19 @@ class Player {
         this.debt += amount;
         if (this.debt > 700000) this.debt = 700000; 
     }
+
+    calculate_income_tax(income)
+    {
+        if (income > 721314) return 0.123;
+        else if (income > 432787) return 0.113;
+        else if (income > 360659) return 0.103;
+        else if (income > 70606) return 0.093;
+        else if (income > 55866) return 0.08;
+        else if (income > 40245) return 0.06;
+        else if (income > 25499) return 0.04;
+        else if (income > 10756) return 0.02;
+        else return 0.01%
+    }
 }
             
 function display_stats() {
@@ -465,23 +480,24 @@ function display_stats() {
     let housingEl = document.getElementById("housing");
     let carEl = document.getElementById("car");
     let expenseEl = document.getElementById("expenses");
+    let gameplay = document.getElementById("gameplay");
     
     if (!housingEl && player.housing) {
         housingEl = document.createElement("p");
         housingEl.id = "housing";
-        document.body.appendChild(housingEl);
+        gameplay.appendChild(housingEl);
     }
     
     if (!carEl && player.car) {
         carEl = document.createElement("p");
         carEl.id = "car";
-        document.body.appendChild(carEl);
+        gameplay.appendChild(carEl);
     }
     
     if (!expenseEl && player.monthly_expenses > 0) {
         expenseEl = document.createElement("p");
         expenseEl.id = "expenses";
-        document.body.appendChild(expenseEl);
+        gameplay.appendChild(expenseEl);
     }
     
     if (housingEl && player.housing) {
