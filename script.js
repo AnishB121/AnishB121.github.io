@@ -48,7 +48,7 @@ class Player {
         
         if (this.job) {
             console.log(this.job[1]);
-            let raw_income = job[1] * (1 - calculate_income_tax(job[1]));
+            let raw_income = this.job[1] * (1 - this.calculate_income_tax(this.job[1]));
             this.wealth = parseFloat(this.wealth) + (4 * parseInt(raw_income));
         }
         
@@ -66,6 +66,7 @@ class Player {
         display_stats();
         
         show("continue");
+        if (this.age >= 42) this.end_game();
     }
     
     life_decisions() {
@@ -466,6 +467,12 @@ class Player {
         else if (income > 25499) return 0.04;
         else if (income > 10756) return 0.02;
         else return 0.01;
+    }
+
+    end_game()
+    {
+        hide("continue");
+        display_gameplay("You made it to 42!", document.createElement("div"));
     }
 }
             
