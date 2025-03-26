@@ -475,6 +475,62 @@ class Player {
         display_gameplay("You made it to 42!", document.createElement("div"));
     }
 }
+
+class EventChain
+{
+    constructor (events)
+    {
+        this.events = events;
+    }
+}
+
+class Event
+{
+    constructor (prompt, actions)
+    {
+        this.prompt = prompt;
+        this.actions = actions;
+    }
+}
+
+class Action
+{
+    constructor (description, change_type, stress, initial_cost, continuous_cost, debt, duration)
+    {
+        this.description = description;
+        this.change_type = change_type;
+        this.stress = stress;
+        this.initial_cost = initial_cost;
+        this.continuous_cost = continuous_cost;
+        this.debt = debt;
+        this.duration = duration;
+    }
+
+    apply_changes()
+    {
+        player.stress += this.stress;
+        let new_wealth = player.wealth;
+        if (this.change_type == "percentage") new_wealth *= this.initial_cost;
+        else if (this.change_type == "flat") new_wealth += this.initial_cost;
+        player.wealth = new_wealth;
+    }
+
+    apply_continuous_change()
+    {
+        let new_wealth = player.wealth;
+        if (this.change_type == "percentage") new_wealth *= this.continuous_cost;
+        else if (this.change_type == "flat") new_wealth += this.continuous_cost;
+        player.wealth = new_wealth;
+    }
+}
+
+class TimeKeeper
+{
+    constructor ()
+    {
+
+    }
+}
             
 function display_stats() {
     console.log(player.wealth);
