@@ -611,3 +611,5 @@ function hide_gameplay() {
 
 const player = new Player('Player', 18, 10000, 0, 'wait', null, 0, 0);
 run();
+//TODO: finish game
+/// Add gambling(important )
