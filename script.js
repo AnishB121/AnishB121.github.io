@@ -2,27 +2,32 @@
 // fix trade school path since its 2 years so we will have to add 2 years extra of income
 // Also debt is growing kinda slow so maybe make intrest rate higher 
 class Player {
-    constructor(name, age, wealth, stress, education, job, debt, job_experience) {
-        this.name = name;
-        this.age = age;
-        this.wealth = wealth;
-        this.stress = stress; // percent from 0 -100
-        this.education = education;
-        this.job = job; // ['job_name', yearly income]
-        this.debt = debt;
-        this.job_experience = job_experience; //years 
+    constructor(name, age, wealth, stress) {
+        this.stats = {
+            'name': name,
+            'age': age, 
+            'wealth': wealth,
+            'stress': stress,
+            'debt': 0,
+            'job_experience': 0,
+            'job': null,
+            'education':'wait',
+
+        }
+        this.stats.debt = 0;
+        this.job_experience = 0; //years 
         this.car = null; // [car_name, value, monthly_payment]
         this.housing = null; // [housing_type, value, monthly_payment]
         this.monthly_expenses = 0;
     }
 
     chapter() {
-        if (this.age === 18 && this.education == "wait") {
+        if (this.stats.age === 18 && this.stats.education == "wait") {
             this.education_choice();
             return;
         }
 
-        if (this.job === null) {
+        if (this.stats.job === null) {
             this.get_job();
             return;
         }
@@ -38,41 +43,41 @@ class Player {
             return;
         }
 
-        console.log(`pre chapter - Debt: ${this.debt}, Wealth: ${this.wealth}`);
+        console.log(`pre chapter - Debt: ${this.stats.debt}, Wealth: ${this.stats.wealth}`);
         
         const monthlyExpenses = this.monthly_expenses * 48; 
-        this.wealth -= monthlyExpenses;
+        this.stats.wealth -= monthlyExpenses;
         
-        this.age = this.age + 4;
-        this.debt *= 1.07;
+        this.stats.age = this.stats.age + 4;
+        this.stats.debt *= 1.07;
         
-        if (this.job) {
-            console.log(this.job[1]);
-            let raw_income = this.job[1] * (1 - this.calculate_income_tax(this.job[1]));
-            this.wealth = parseFloat(this.wealth) + (4 * parseInt(raw_income));
+        if (this.stats.job) {
+            console.log(this.stats.job[1]);
+            let raw_income = this.stats.job[1] * (1 - this.calculate_income_tax(this.stats.job[1]));
+            this.stats.wealth = parseFloat(this.stats.wealth) + (4 * parseInt(raw_income));
         }
         
-        if (this.education == "Trade School") {
-            this.stress = 70;
-        } else if (this.education == "4 Year College") {
-            this.stress = 90;
+        if (this.stats.education == "Trade School") {
+            this.stats.stress = 70;
+        } else if (this.stats.education == "4 Year College") {
+            this.stats.stress = 90;
         } else {
-            this.stress = 60;
+            this.stats.stress = 60;
         }
         
         this.set_stress();
         
-        console.log(`post chapter - Debt: ${this.debt}, Wealth: ${this.wealth}`);
+        console.log(`post chapter - Debt: ${this.stats.debt}, Wealth: ${this.stats.wealth}`);
         display_stats();
         
         show("continue");
-        if (this.age >= 42) this.end_game();
+        if (this.stats.age >= 42) this.end_game();
     }
     
     life_decisions() {
         const messageDiv = document.createElement("div");
         const message = document.createElement("p");
-        message.innerHTML = `You're earning $${Number(this.job[1]).toLocaleString()}/year.<br>It's time to make some important life decisions.`;
+        message.innerHTML = `You're earning $${Number(this.stats.job[1]).toLocaleString()}/year.<br>It's time to make some important life decisions.`;
         
         const housingBtn = document.createElement("button");
         housingBtn.innerText = "Look for Housing";
@@ -96,7 +101,7 @@ class Player {
             const continueBtn = document.createElement("button");
             continueBtn.innerText = "Continue to Next Chapter";
             continueBtn.onclick = () => {
-                this.stress += 10; 
+                this.stats.stress += 10; 
                 this.housing = ["Parents' House", 0, 300];
                 this.car = ["Public Transportation", 0, 100];
                 this.monthly_expenses += 400; 
@@ -171,7 +176,7 @@ class Player {
     select_housing(option) {
         this.housing = [option.type, option.value, option.monthly];
         this.monthly_expenses += option.monthly;
-        this.stress += option.stress;
+        this.stats.stress += option.stress;
         
         const resultDiv = document.createElement("div");
         const message = document.createElement("p");
@@ -207,11 +212,11 @@ class Player {
         carDiv.appendChild(introduction);
         
         const options = [
-            {name: "Used Economy Car", value: 8000, monthly: 150, reliability: "Fair", stress: 5},
-            {name: "New Economy Car", value: 20000, monthly: 350, reliability: "Good", stress: 0},
-            {name: "Used Luxury Car", value: 25000, monthly: 450, reliability: "Poor", stress: 10},
-            {name: "New SUV", value: 35000, monthly: 550, reliability: "Excellent", stress: -5},
-            {name: "Public Transportation", value: 0, monthly: 100, reliability: "N/A", stress: 8}
+            {name: "Used Economy Car", value: 8000, monthly: 150, reliability: 25, stress: 5},
+            {name: "New Economy Car", value: 20000, monthly: 350, reliability: 50, stress: 0},
+            {name: "Used Luxury Car", value: 25000, monthly: 450, reliability: 75, stress: 10},
+            {name: "New SUV", value: 35000, monthly: 550, reliability: 100, stress: -5},
+            {name: "Public Transportation", value: 0, monthly: 100, reliability: 0, stress: 8}
         ];
         
         for (const option of options) {
@@ -238,6 +243,9 @@ class Player {
         display_gameplay("Transportation Options", carDiv);
     }
     
+
+
+
     get_car_description(option) {
         switch(option.name) {
             case "Used Economy Car":
@@ -259,21 +267,21 @@ class Player {
         if (option.name !== "Public Transportation") {
             if (option.value > 0) {
                 const downPayment = option.value * 0.1;
-                if (this.wealth < downPayment) {
+                if (this.stats.wealth < downPayment) {
                     alert("You can't afford the down payment for this car!");
                     this.car_options();
                     return;
                 }
-                this.wealth -= downPayment;
-                this.debt += (option.value - downPayment); 
+                this.stats.wealth -= downPayment;
+                this.stats.debt += (option.value - downPayment); 
             }
-            this.car = [option.name, option.value, option.monthly];
+            this.car = [option.name, option.value, option.monthly, option.reliability];
         } else {
-            this.car = ["Public Transportation", 0, option.monthly];
+            this.car = ["Public Transportation", 0, option.monthly,option.reliability];
         }
         
         this.monthly_expenses += option.monthly;
-        this.stress += option.stress;
+        this.stats.stress += option.stress;
         
         const resultDiv = document.createElement("div");
         const message = document.createElement("p");
@@ -311,7 +319,7 @@ class Player {
         const jobButton = document.createElement("button");
         jobButton.innerText = "Get a Job";
         jobButton.onclick = () => {
-            this.education = "High School";
+            this.stats.education = "High School";
             hide_gameplay();
             this.get_job();
         };
@@ -340,8 +348,8 @@ class Player {
     attend_trade_school() {
         const tradeCost = Math.floor(Math.random() * 20000) + 10000;
         this.add_debt(tradeCost);
-        this.education = "Trade School";
-        this.age += 2; 
+        this.stats.education = "Trade School";
+        this.stats.age += 2; 
         
         const messageDiv = document.createElement("div");
         const message = document.createElement("p");
@@ -363,8 +371,8 @@ class Player {
     attend_college() {
         const collegeCost = Math.floor(Math.random() * 70000) + 30000;
         this.add_debt(collegeCost);
-        this.education = "4 Year College";
-        this.age += 4; 
+        this.stats.education = "4 Year College";
+        this.stats.age += 4; 
         
         const messageDiv = document.createElement("div");
         const message = document.createElement("p");
@@ -405,8 +413,8 @@ class Player {
             ]
         };
 
-        const experienceMultiplier = 1 + (this.job_experience / 10); 
-        const educationLevel = this.education || "High School";
+        const experienceMultiplier = 1 + (this.stats.job_experience / 10); 
+        const educationLevel = this.stats.education || "High School";
         console.log(educationLevel);
         console.log(jobs);
         const availableJobs = jobs[educationLevel];
@@ -426,8 +434,8 @@ class Player {
     }
 
     select_job(jobTitle, salary) {
-        this.job = [jobTitle, salary];
-        this.job_experience += 4; 
+        this.stats.job = [jobTitle, salary];
+        this.stats.job_experience += 4; 
         hide_gameplay();
         display_stats();
         
@@ -439,22 +447,22 @@ class Player {
     }
 
     buy(x) {
-        if (this.wealth >= x[0]) {
-            this.wealth = this.wealth - x[0];
+        if (this.stats.wealth >= x[0]) {
+            this.stats.wealth = this.stats.wealth - x[0];
         } else {
             alert('You\'re too broke to afford this');
         }
     }
 
     set_stress() {
-        if (this.debt > 0) {
-            this.stress = Math.min(100, 40 + 0.000001 * Math.pow(Math.E, this.debt/10000));
+        if (this.stats.debt > 0) {
+            this.stats.stress = Math.min(100, 40 + 0.000001 * Math.pow(Math.E, this.stats.debt/10000));
         }
     }
 
     add_debt(amount) {
-        this.debt += amount;
-        if (this.debt > 700000) this.debt = 700000; 
+        this.stats.debt += amount;
+        if (this.stats.debt > 700000) this.stats.debt = 700000; 
     }
 
     calculate_income_tax(income) {
@@ -475,6 +483,10 @@ class Player {
         display_gameplay("You made it to 42!", document.createElement("div"));
     }
 }
+
+
+
+
 
 class EventChain
 {
@@ -499,28 +511,28 @@ class Action
     {
         this.description = description;
         this.change_type = change_type;
-        this.stress = stress;
+        this.stats.stress = stress;
         this.initial_cost = initial_cost;
         this.continuous_cost = continuous_cost;
-        this.debt = debt;
+        this.stats.debt = debt;
         this.duration = duration;
     }
 
     apply_changes()
     {
-        player.stress += this.stress;
-        let new_wealth = player.wealth;
+        player.stress += this.stats.stress;
+        let new_wealth = player.stats.wealth;
         if (this.change_type == "percentage") new_wealth *= this.initial_cost;
         else if (this.change_type == "flat") new_wealth += this.initial_cost;
-        player.wealth = new_wealth;
+        player.stats.wealth = new_wealth;
     }
 
     apply_continuous_change()
     {
-        let new_wealth = player.wealth;
+        let new_wealth = player.stats.wealth;
         if (this.change_type == "percentage") new_wealth *= this.continuous_cost;
         else if (this.change_type == "flat") new_wealth += this.continuous_cost;
-        player.wealth = new_wealth;
+        player.stats.wealth = new_wealth;
     }
 }
 
@@ -533,11 +545,11 @@ class TimeKeeper
 }
             
 function display_stats() {
-    console.log(player.wealth);
+    console.log(player.stats.wealth);
     
-    document.getElementById("debt").innerHTML = `Debt: $${Math.round(player.debt).toLocaleString()}`;
-    document.getElementById("wealth").innerHTML = `Wealth: $${Math.round(player.wealth).toLocaleString()}`;
-    document.getElementById("age").innerHTML = `Age: ${player.age}`;
+    document.getElementById("debt").innerHTML = `Debt: $${Math.round(player.stats.debt).toLocaleString()}`;
+    document.getElementById("wealth").innerHTML = `Wealth: $${Math.round(player.stats.wealth).toLocaleString()}`;
+    document.getElementById("age").innerHTML = `Age: ${player.stats.age}`;
     
     let housingEl = document.getElementById("housing");
     let carEl = document.getElementById("car");
