@@ -1,6 +1,44 @@
 //todo
 // fix trade school path since its 2 years so we will have to add 2 years extra of income
 // Also debt is growing kinda slow so maybe make intrest rate higher 
+function fetchSalary(jobTitle) {
+    const apiToken = 'your so skibidi';      
+    const userId = 'sigma';           
+    const location = 'US';                    
+    const enableMetaData = false;             
+    const endpoint = `https://api.careeronestop.org/v1/comparesalaries/${userId}/wage?keyword=${encodeURIComponent(jobTitle)}&location=${encodeURIComponent(location)}&enableMetaData=${enableMetaData}`;
+    
+    return fetch(endpoint, {
+      headers: {
+        'Authorization': `Bearer ${apiToken}`,
+        'Accept': 'application/json'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (
+        data &&
+        data.OccupationDetail &&
+        data.OccupationDetail.Wages &&
+        Array.isArray(data.OccupationDetail.Wages.NationalWagesList)
+      ) {
+        const annualWageObj = data.OccupationDetail.Wages.NationalWagesList.find(wage => wage.RateType === "Annual");
+        if (annualWageObj && annualWageObj.Median) {
+          return parseInt(annualWageObj.Median, 10);
+        }
+      }
+      return undefined; 
+    })
+    .catch(err => {
+      console.error(`Error fetching salary for ${jobTitle}:`, err);
+      return undefined;
+    });
+}
 class Player {
     constructor(name, age, wealth, stress) {
         this.stats = {
@@ -64,7 +102,8 @@ class Player {
         return this.objects[object];
     }
 
-    chapter() {
+    async chapter() {
+        await this.checkCarBreakdown();
         if (this.get_stat('age') === 18 && !this.get_stat('education')) {
             this.education_choice();
             return;
@@ -362,6 +401,95 @@ class Player {
         
         display_gameplay("Transportation Selected", resultDiv);
     }
+    checkCarBreakdown() {
+        if (this.get_stat('age') < 22) return Promise.resolve();
+    
+        const car = this.get_object('car');
+        if (!car) return Promise.resolve(); 
+        if (Math.random() < 1) {
+            const breakdownDiv = document.createElement("div");
+            const message = document.createElement("p");
+            message.innerText = "Oh no! Your car has broken down.";
+            breakdownDiv.appendChild(message);
+            
+            const repairBtn = document.createElement("button");
+            repairBtn.innerText = "Repair Car";
+            
+            const replaceBtn = document.createElement("button");
+            replaceBtn.innerText = "Replace Car";
+            
+            breakdownDiv.appendChild(repairBtn);
+            breakdownDiv.appendChild(document.createElement("br"));
+            breakdownDiv.appendChild(replaceBtn);
+            
+            display_gameplay("Car Breakdown!", breakdownDiv);
+            
+            return new Promise(resolve => {
+                repairBtn.onclick = () => {
+                    const repairCost = Math.floor(car[1] * (0.15 + Math.random() * 0.15));
+                    if (this.get_stat('wealth') < repairCost) {
+                        alert("You can't afford the repair! You must replace your car.");
+                        this.replaceCar();
+                    } else {
+                        this.change_stat('wealth', -repairCost);
+                        alert(`Your car was repaired for $${repairCost.toLocaleString()}.`);
+                    }
+                    hide_gameplay();
+                    resolve();
+                };
+                replaceBtn.onclick = () => {
+                    this.replaceCar();
+                    hide_gameplay();
+                    resolve();
+                };
+            });
+        } else {
+            return Promise.resolve(); 
+        }
+    }
+    car_replacement_options() {
+        const carDiv = document.createElement("div");
+        const introduction = document.createElement("p");
+        introduction.innerText = "Your car is beyond repair. Choose a new car:";
+        carDiv.appendChild(introduction);
+    
+        const options = [
+            {name: "Used Economy Car", value: 8000, monthly: 150, reliability: 25, stress: 5},
+            {name: "New Economy Car", value: 20000, monthly: 350, reliability: 50, stress: 0},
+            {name: "Used Luxury Car", value: 25000, monthly: 450, reliability: 75, stress: 10},
+            {name: "New SUV", value: 35000, monthly: 550, reliability: 100, stress: -5},
+            {name: "Public Transportation", value: 0, monthly: 100, reliability: 0, stress: 8}
+        ];
+        
+        for (const option of options) {
+            const button = document.createElement("button");
+            if (option.name === "Public Transportation") {
+                button.innerText = `${option.name} - $${option.monthly}/month`;
+            } else {
+                button.innerText = `${option.name} - $${option.value.toLocaleString()} ($${option.monthly}/month)`;
+            }
+            button.onclick = () => {
+                this.select_car(option);
+            };
+            carDiv.appendChild(button);
+            carDiv.appendChild(document.createElement("br"));
+            
+            const description = document.createElement("p");
+            description.innerText = this.get_car_description(option);
+            description.style.fontSize = "0.9em";
+            description.style.marginLeft = "20px";
+            description.style.marginBottom = "15px";
+            carDiv.appendChild(description);
+        }
+        
+        display_gameplay("Replace Car Options", carDiv);
+    }
+    
+    replaceCar() {
+        alert("Your car is no longer usable and must be replaced.");
+        this.set_object('car', null);
+        this.car_replacement_options();
+    }
 
     education_choice() {
         const choicesDiv = document.createElement("div");
@@ -442,24 +570,24 @@ class Player {
         display_gameplay("College Complete!", messageDiv);
     }
 
-    get_job() {
+    async get_job() {
         const jobs = {
             "High School": [
-                { title: "Walmart", baseSalary: 28000 },
-                { title: "Construction", baseSalary: 32000 },
-                { title: "McDonalds", baseSalary: 25000 }
+                { title: "Walmart", baseSalary: 28000,onet: "41-2031.00" },
+                { title: "Construction", baseSalary: 32000,onet: "47-2061.00"},
+                { title: "McDonalds", baseSalary: 25000, onet: "35-9031.00" }
             ],
             
             "Trade School": [
-                { title: "Electrician", baseSalary: 50000 },
-                { title: "Plumber", baseSalary: 48000 },
-                { title: "Technician", baseSalary: 47000 }
+                { title: "Electrician", baseSalary: 50000,onet: "47-2111.00" },
+                { title: "Plumber", baseSalary: 48000, onet: "47-2152.00" },
+                { title: "Technician", baseSalary: 47000, onet: "49-9022.00" }
             ],
             
             "4 Year College": [
-                { title: "Software Manager", baseSalary: 70000 },
-                { title: "Financial Analyst", baseSalary: 65000 },
-                { title: "Marketing Manager", baseSalary: 60000 }
+                { title: "Software Manager", baseSalary: 70000, onet: "11-3021.00" },
+                { title: "Financial Analyst", baseSalary: 65000, onet: "13-2051.00" },
+                { title: "Marketing Manager", baseSalary: 60000, onet: "11-2021.00" }
             ]
         };
 
@@ -471,9 +599,13 @@ class Player {
         console.log(availableJobs);
 
         const jobOptionsDiv = document.createElement("div");
-        for (const {title, baseSalary} of availableJobs) {
+        for (const {title, baseSalary, onet} of availableJobs) {
             console.log(`${title}: ${baseSalary}`);
-            const adjustedSalary = Math.round(baseSalary * experienceMultiplier);
+            let salary = await fetchSalary(onet);
+            if (!salary) {
+                salary = baseSalary;
+            }
+            const adjustedSalary = Math.round(salary * experienceMultiplier);
             const jobButton = document.createElement("button");
             jobButton.innerText = `${title} - $${adjustedSalary.toLocaleString()}/year`;
             jobButton.onclick = () => this.select_job(title, adjustedSalary);
