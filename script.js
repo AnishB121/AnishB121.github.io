@@ -406,7 +406,7 @@ class Player {
     
         const car = this.get_object('car');
         if (!car) return Promise.resolve(); 
-        if (Math.random() < 1) {
+        if (Math.random() < 0.3) {
             const breakdownDiv = document.createElement("div");
             const message = document.createElement("p");
             message.innerText = "Oh no! Your car has broken down.";
