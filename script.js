@@ -1,44 +1,6 @@
 //todo
 // fix trade school path since its 2 years so we will have to add 2 years extra of income
 // Also debt is growing kinda slow so maybe make intrest rate higher 
-function fetchSalary(jobTitle) {
-    const apiToken = 'WXbtyt0meTcNlRcEThuSOJGaP8XKRUn0009mB79Gaitx8/cln5SfS1VxF2XlgC7uAbHQSLEBVed96/MClAUYug==';      
-    const userId = 'cx5ugVoCSXKRe7u';           
-    const location = 'US';                    
-    const enableMetaData = false;             
-    const endpoint = `https://api.careeronestop.org/v1/comparesalaries/${userId}/wage?keyword=${encodeURIComponent(jobTitle)}&location=${encodeURIComponent(location)}&enableMetaData=${enableMetaData}`;
-    
-    return fetch(endpoint, {
-      headers: {
-        'Authorization': `Bearer ${apiToken}`,
-        'Accept': 'application/json'
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('API request failed');
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (
-        data &&
-        data.OccupationDetail &&
-        data.OccupationDetail.Wages &&
-        Array.isArray(data.OccupationDetail.Wages.NationalWagesList)
-      ) {
-        const annualWageObj = data.OccupationDetail.Wages.NationalWagesList.find(wage => wage.RateType === "Annual");
-        if (annualWageObj && annualWageObj.Median) {
-          return parseInt(annualWageObj.Median, 10);
-        }
-      }
-      return undefined; 
-    })
-    .catch(err => {
-      console.error(`Error fetching salary for ${jobTitle}:`, err);
-      return undefined;
-    });
-}
 class Player {
     constructor(name, age, wealth, stress) {
         this.stats = {
@@ -480,24 +442,24 @@ class Player {
         display_gameplay("College Complete!", messageDiv);
     }
 
-    async get_job() {
+    get_job() {
         const jobs = {
             "High School": [
-                { title: "Walmart", baseSalary: 28000,onet: "41-2031.00" },
-                { title: "Construction", baseSalary: 32000,onet: "47-2061.00"},
-                { title: "McDonalds", baseSalary: 25000, onet: "35-9031.00" }
+                { title: "Walmart", baseSalary: 28000 },
+                { title: "Construction", baseSalary: 32000 },
+                { title: "McDonalds", baseSalary: 25000 }
             ],
             
             "Trade School": [
-                { title: "Electrician", baseSalary: 50000,onet: "47-2111.00" },
-                { title: "Plumber", baseSalary: 48000, onet: "47-2152.00" },
-                { title: "Technician", baseSalary: 47000, onet: "49-9022.00" }
+                { title: "Electrician", baseSalary: 50000 },
+                { title: "Plumber", baseSalary: 48000 },
+                { title: "Technician", baseSalary: 47000 }
             ],
             
             "4 Year College": [
-                { title: "Software Manager", baseSalary: 70000, onet: "11-3021.00" },
-                { title: "Financial Analyst", baseSalary: 65000, onet: "13-2051.00" },
-                { title: "Marketing Manager", baseSalary: 60000, onet: "11-2021.00" }
+                { title: "Software Manager", baseSalary: 70000 },
+                { title: "Financial Analyst", baseSalary: 65000 },
+                { title: "Marketing Manager", baseSalary: 60000 }
             ]
         };
 
@@ -509,13 +471,9 @@ class Player {
         console.log(availableJobs);
 
         const jobOptionsDiv = document.createElement("div");
-        for (const {title, baseSalary,onet} of availableJobs) {
+        for (const {title, baseSalary} of availableJobs) {
             console.log(`${title}: ${baseSalary}`);
-            let salary = await fetchSalary(onet);
-            if (!salary) {
-                salary = baseSalary;
-            }
-            const adjustedSalary = Math.round(salary * experienceMultiplier);
+            const adjustedSalary = Math.round(baseSalary * experienceMultiplier);
             const jobButton = document.createElement("button");
             jobButton.innerText = `${title} - $${adjustedSalary.toLocaleString()}/year`;
             jobButton.onclick = () => this.select_job(title, adjustedSalary);
